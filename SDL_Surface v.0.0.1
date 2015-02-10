@@ -1,0 +1,225 @@
+/*
+ * main.cpp
+ *
+ *  Created on: Feb 5, 2015
+ *      Author: Aaron Hung
+ *   
+ */
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <stdio.h>
+#include <string>
+
+const int BUTTON_WIDTH = 100;
+const int BUTTON_HEIGHT = 100;
+const int TOTAL_BUTTONS = 12;
+
+
+//button class
+class Button
+{
+	public:
+		Button();
+		void setPosition(int x, int y);
+		void eventHandle(SDL_Event*e);
+	private:
+		SDL_Point mPosition;
+};
+
+Button :: Button()
+{
+	mPosition. x = 0;
+	mPosition. y = 0;
+}
+
+void Button :: setPosition( int x, int y)
+{
+	mPosition.x = x;
+	mPosition.y = y;
+}
+
+void Button :: eventHandle(SDL_Event *e)
+{
+	if(e->type == SDL_MOUSEBUTTONDOWN)
+	{
+		int x,y;
+		SDL_GetMouseState(&x,&y);
+		
+
+		if((x >=0 && x<=99) && (y >= 0 && y <=99))
+			printf("chicken\n");
+		else if(( x >=100 && x<=199) &&(y>=0 && y<=99))
+			printf("pig\n");
+		else if(( x >=200 && x<=299) &&(y>=0 && y<=99))
+			printf("garen\n");
+	}
+}
+
+Button gButtons[TOTAL_BUTTONS];
+
+bool loadButton();	
+bool init();
+SDL_Surface* load_media(std::string path);
+void close();
+
+const int WIDTH = 910;
+const int HEIGHT = 400;
+
+SDL_Window* window = NULL;
+SDL_Surface* window_surface = NULL;
+SDL_Surface* screen = NULL;
+SDL_Surface* keypad = NULL;
+SDL_Rect upper_right;
+
+int main (int argc, char* args[]) 
+	{
+	bool success = true;
+
+	success = init();
+	if (success)
+	{			
+		screen = load_media("/home/quw/sdl2/main/Images/Screen_lightgrey-610x400.png");
+		keypad = load_media("/home/quw/sdl2/main/Images/keypad-300x400.png");
+		        
+
+		
+
+
+	}
+
+	SDL_BlitSurface(keypad, NULL, window_surface, NULL);
+
+	upper_right.x = 300;
+	upper_right.y = 0;
+	upper_right.w = 610;
+	upper_right.h = 400;
+
+	SDL_BlitSurface(screen, NULL, window_surface, &upper_right);
+
+	SDL_UpdateWindowSurface(window);
+
+	if(!loadButton())
+	{
+		printf("Failed to load button\n");
+	}
+	else
+	{
+		bool quit = false;
+		SDL_Event e;
+		while(!quit)
+		{
+				while( SDL_PollEvent( &e ) != 0 )
+				{
+					//User requests quit
+					if( e.type == SDL_QUIT )
+					{
+						quit = true;
+					}
+					
+					//Handle button events
+					//for( int i = 0; i < TOTAL_BUTTONS; ++i )
+					//{
+						int i = 0;
+						gButtons[ i ].eventHandle( &e );
+					//}
+				}
+
+		}
+	
+	}
+	close();
+
+	return 0;
+}
+
+bool init() {
+	bool success = true;
+
+	if(SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+		success = false;
+	}
+	else
+	{
+		window = SDL_CreateWindow("Kiosk-0.02", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+		if(window == NULL)
+		{
+			printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
+			success = false;
+		}
+		else
+		{
+			int imgFlags = IMG_INIT_PNG;
+			if (!(IMG_Init(imgFlags) & imgFlags))
+			{
+				printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+				success = false;
+			}
+			else
+			{
+				window_surface = SDL_GetWindowSurface(window);
+			}
+		}
+	}
+
+	return success;
+}
+
+SDL_Surface* load_media(std::string path) {
+	SDL_Surface* optimized_surface = NULL;
+
+	SDL_Surface* loaded_surface = IMG_Load(path.c_str());
+	if (loaded_surface == NULL)
+	{
+		printf("Unable to load image %s! SDL_Image Error: %s\n", path.c_str(), IMG_GetError());
+	}
+	else
+	{
+		optimized_surface = SDL_ConvertSurface(loaded_surface, window_surface->format, NULL);
+		if (optimized_surface == NULL)
+		{
+			printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
+		}
+
+		SDL_FreeSurface(loaded_surface);
+	}
+
+	return optimized_surface;
+}
+
+bool loadButton()
+{
+	int k = 0;
+	bool success = true;
+	
+	if(keypad = NULL)
+	{
+		printf("Failed to load keypad!\n");
+		success = false;
+	}
+	else
+	{
+		for(int i =0; i<4; i++)
+		{
+			for(int j=0; j<3; j++)
+			{
+				gButtons[k].setPosition(j*100, i*100);
+				k++;
+			printf("button %d is at position %d, %d\n", k, j*100, i*100);
+			}
+		}
+	}
+
+	return success;
+}
+void close() {
+	SDL_FreeSurface(screen);
+
+	SDL_DestroyWindow(window);
+	window = NULL;
+
+	IMG_Quit();
+	SDL_Quit();
+}
