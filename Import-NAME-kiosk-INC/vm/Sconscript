@@ -1,7 +1,0 @@
-Import('*')
-
-NAME = 'kiosk'
-INC =  [ '#/vm/inc' ]
-SRC = Glob('*.cpp')
-
-buildSharedLibrary(NAME, SRC, CPPPATH=INC)
