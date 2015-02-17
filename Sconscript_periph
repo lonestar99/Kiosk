@@ -1,7 +1,7 @@
 Import('*')
 
 NAME = 'kiosk'
-INC =  [ '#/vm/inc' ]
+INC =  [ '#/vm/inc/SDL2' ]
 SRC = Glob('*.cpp')
 
 buildSharedLibrary(NAME, SRC, CPPPATH=INC)
