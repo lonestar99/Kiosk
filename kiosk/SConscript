@@ -1,0 +1,7 @@
+Import('*')
+
+NAME = 'kiosk'
+INC =  [ '#/peripherals/kiosk' ]
+SRC = Glob('*.cpp')
+
+buildSharedLibrary(NAME, SRC, CPPPATH=INC)

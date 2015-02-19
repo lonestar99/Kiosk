@@ -1,0 +1,6 @@
+place the kiosk folder in miniat/peripherals
+place the sconscript folder in miniat/system/console 
+in the main miniat directory, run "scons"
+cd to miniat/peripherals/kiosk
+run "make all"
+run "./kiosk"
